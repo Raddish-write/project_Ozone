@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 3
+  tags:
+  - LowerBoundary
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - BG_fore
+  - BG_mid
+  - BG_back
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: hidden
+    uniqueID: 2737881179
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: BG_back
+    uniqueID: 993077291
+    locked: 0
+  - name: BG_mid
+    uniqueID: 901679199
+    locked: 0
+  - name: BG_front
+    uniqueID: 4289433489
+    locked: 0
+  - name: play_layer
+    uniqueID: 3158743661
+    locked: 0
+  - name: overlay_layer
+    uniqueID: 3928521611
+    locked: 0
+  m_RenderingLayers:
+  - Default
