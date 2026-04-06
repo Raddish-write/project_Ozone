@@ -47,10 +47,8 @@ public class BallScript : MonoBehaviour
                 rb.bodyType = RigidbodyType2D.Kinematic;
                 rb.constraints = RigidbodyConstraints2D.FreezePosition;
 
-                if (!PlayScript.ballGraph.ContainsKey(ballID))
-                {
-                    PlayScript.ballGraph[ballID] = gameObject;
-                }
+                PlayScript.ballGraph[ballID] = gameObject;
+                
                 if (!otherBall.adjList.Contains(ballID))
                 {
                     otherBall.adjList.Add(ballID);

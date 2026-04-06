@@ -26,8 +26,7 @@ public class PlayScript : MonoBehaviour
     PreviewScript preview;
     CielingScript cieling;
     ScoreBoardScript scoreBoard;
-
-    bool deleteSound = true; //used to toggle between delete and combo sounds 
+ 
 
     private float stepTimer;
     private bool stepPending;
@@ -73,7 +72,6 @@ public class PlayScript : MonoBehaviour
                 ballGraph[i].GetComponent<BallScript>().adjList.Add(-1);
             }
         }
-        //Debug.Log($"Source adjList count after loadLevel: {sourceBall.adjList.Count}");
 
         preview.loadPreview(ballQueue);
         cieling.setReset(); //moves cieling back for new level 
@@ -129,25 +127,45 @@ public class PlayScript : MonoBehaviour
         reticle.startRotating();
     }//fire and reload encapsulated for future seperation for game logic
 
-    void checkHit(GameObject ball)
+    IEnumerator checkHit(GameObject ball)
     {
         int ballID = ball.GetComponent<BallScript>().ballID;
         int colorID = ball.GetComponent<BallScript>().colorID;
         isChecking = true;
+
         depthFirstSearch(ballID, colorID);
-        Invoke("destroyMarked", 0.1f);
-        Invoke("checkRoof", 0.4f);
-        Invoke("checkForWin", 0.8f);
+
+        yield return StartCoroutine(destroyMarkedCoroutine());
+        yield return new WaitForSeconds(0.2f);
+        yield return StartCoroutine(checkRoofCoroutine());
+        yield return StartCoroutine(checkForWinCoroutine());
 
         hasHit = false;
         hasFired = false;
     }
 
-    // helper function to checkHit and checkCieling
-    void destroyMarked()
+    IEnumerator destroyMarkedCoroutine()
+    {
+        destroyMarked(false);
+        yield return null;
+    }
+
+    IEnumerator checkRoofCoroutine()
+    {
+        checkRoof();
+        yield return null;
+    }
+
+    IEnumerator checkForWinCoroutine()
+    {
+        checkForWin();
+        yield return null;
+    }
+
+    void destroyMarked(bool isCieling)
     {
         List<int> markedBalls = new List<int>();
-        foreach(KeyValuePair<int, GameObject> ball in ballGraph)
+        foreach (KeyValuePair<int, GameObject> ball in ballGraph)
         {
             if (ball.Key != -1) //keeps from deleting the source
             {
@@ -159,7 +177,7 @@ public class PlayScript : MonoBehaviour
             }
         }
 
-        if (markedBalls.Count == 1) { return; }
+        if (markedBalls.Count == 1 && !isCieling) { return; }
 
         foreach (int ballID in markedBalls)
             {
@@ -192,11 +210,18 @@ public class PlayScript : MonoBehaviour
         {
             scoreBoard.combo(marked);
         }
-        Invoke("destroyMarked", 0.2f);
+        destroyMarked(true);
     }
 
-    // helper function for checkroof and destroy marked
-    // overloaded to track visitation to fix infinite recursion loop
+    void checkForWin()
+    {
+        if (ballGraph[-1].GetComponent<BallScript>().adjList.Count == 0)
+        {
+            EndGameScript.instance.winGame();
+            //UnityEditor.EditorApplication.isPlaying = false; //placeholder, update with UI update
+        }
+    }
+
     void depthFirstSearch(int ballID, int colorID)
     {
         depthFirstSearch(ballID, colorID, new HashSet<int>());
@@ -266,14 +291,6 @@ public class PlayScript : MonoBehaviour
         }
     }
 
-    void checkForWin()
-    {
-        if (ballGraph[-1].GetComponent<BallScript>().adjList.Count == 0)
-        {
-            EndGameScript.instance.winGame();
-            //UnityEditor.EditorApplication.isPlaying = false; //placeholder, update with UI update
-        }
-    }
     void checkBagEmpty()
     {
         if (ballQueue.Count == 0)
@@ -301,7 +318,7 @@ public class PlayScript : MonoBehaviour
         if (hasHit) 
         {
             hasHit = false;
-            checkHit(lastFired);
+            StartCoroutine(checkHit(lastFired));
             reload();
         }
 
